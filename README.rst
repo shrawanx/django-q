@@ -1,6 +1,7 @@
 This Fork Includes
 
 -  Task Type for schedule task as Permanent or Temporary
+-  Ability to see schedule task run histories
 
     $ pip install git+https://github.com/shrawanx/django-q.git
 

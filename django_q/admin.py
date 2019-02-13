@@ -116,7 +116,6 @@ class ScheduleAdmin(admin.ModelAdmin):
         run_histories = Task.objects.filter(
             func=obj.func,
         ).order_by('-id')
-        print(run_histories)
         context = {
             **self.admin_site.each_context(request),
             'title': _('Schedule Task Run Histories: %s') % obj,
