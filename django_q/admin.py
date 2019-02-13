@@ -1,9 +1,13 @@
 """Admin module for Django."""
 from django.contrib import admin
+from django.contrib.admin.utils import unquote
+from django.core.exceptions import PermissionDenied
+from django.template.response import TemplateResponse
 from django.utils.translation import ugettext_lazy as _
+from django.urls import path
 
 from django_q.conf import Conf
-from django_q.models import Success, Failure, Schedule, OrmQ
+from django_q.models import Success, Failure, Schedule, OrmQ, Task
 from django_q.tasks import async_task
 
 
@@ -90,6 +94,42 @@ class ScheduleAdmin(admin.ModelAdmin):
     list_filter = ('next_run', 'schedule_type')
     search_fields = ('func',)
     list_display_links = ('id', 'name')
+
+    def get_urls(self):
+        _urls = super().get_urls()
+        info = self.model._meta.app_label, self.model._meta.model_name
+
+        return [
+            path('<path:object_id>/run-history/', self.task_run_view, name='%s_%s_run_history' % info),
+        ] + _urls
+
+    def task_run_view(self, request, object_id, extra_context=None):
+        model = self.model
+        obj = self.get_object(request, unquote(object_id))
+        if obj is None:
+            return self._get_obj_does_not_exist_redirect(request, model._meta, object_id)
+
+        if not self.has_view_or_change_permission(request, obj):
+            raise PermissionDenied
+
+        opts = model._meta
+        run_histories = Task.objects.filter(
+            func=obj.func,
+        ).order_by('-id')
+        print(run_histories)
+        context = {
+            **self.admin_site.each_context(request),
+            'title': _('Schedule Task Run Histories: %s') % obj,
+            'object': obj,
+            'run_histories': run_histories,
+            'opts': opts,
+            'preserved_filters': self.get_preserved_filters(request),
+            **(extra_context or {}),
+        }
+
+        request.current_app = self.admin_site.name
+
+        return TemplateResponse(request, 'admin/django_q/schedule/run_histories.html', context)
 
 
 class QueueAdmin(admin.ModelAdmin):

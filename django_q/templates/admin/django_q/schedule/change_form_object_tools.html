@@ -1,0 +1,10 @@
+{% extends 'admin/change_form_object_tools.html' %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+    <li>
+        {% url opts|admin_urlname:'run_history' original.pk|admin_urlquote as task_run_url %}
+        <a href="{% add_preserved_filters task_run_url %}" class="taskrunhistory">{% trans "Run History" %}</a>
+    </li>
+    {{ block.super }}
+{% endblock %}
