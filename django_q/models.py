@@ -151,7 +151,15 @@ class Schedule(models.Model):
         (QUARTERLY, _('Quarterly')),
         (YEARLY, _('Yearly')),
     )
+    PERMANENT = 'P'
+    TEMPORARY = 'T'
+    TASK_TYPE = (
+        (PERMANENT, _('Permanent')),
+        (TEMPORARY, _('Temporary'))
+    )
     schedule_type = models.CharField(max_length=1, choices=TYPE, default=TYPE[0][0], verbose_name=_('Schedule Type'))
+    task_type = models.CharField(max_length=1, choices=TASK_TYPE, default=PERMANENT,
+                                 verbose_name=_('Schedule Task Type'))
     minutes = models.PositiveSmallIntegerField(null=True, blank=True,
                                                help_text=_('Number of minutes for the Minutes type'))
     repeats = models.IntegerField(default=-1, verbose_name=_('Repeats'), help_text=_('n = n times, -1 = forever'))

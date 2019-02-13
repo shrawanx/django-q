@@ -1,3 +1,11 @@
+This Fork Includes
+
+-  Task Type for schedule task as Permanent or Temporary
+
+    $ pip install git+https://github.com/shrawanx/django-q.git
+
+
+
 .. image:: docs/_static/logo.png
     :align: center
     :alt: Q logo
